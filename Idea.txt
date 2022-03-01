@@ -1,0 +1,44 @@
+supersoft :
+builder de logiciel avec lequel je fais tout les autres
+moteur de jeu 2d(isometrique et autre), 3d et exotique (non euclidien, 4d ect...)
+vectoriel et non vectoriel
+modélisation 3d et création d'image 2d intégré (et forme exotique)
+création de son
+machine learning (pour les test et la génération procédural) et génération procédural
+jsplacement
+rendu optionnel entre toutes les méthodes existante
+visual scripting
+le tout personnalisable soit visual scripting, soit en ajoutant de nouveau bloque dans le visual scripting de code en c++ (et possibilité de traduire de n'importe quel langage en c++)
+l'ensemble des nouveaux éléments seront rajouter dans une librairie pour être accessible pour chaque nouveau projet (et donc être plus rapide pour chaque nouveau projet) (mettre en place une recherche rapide et un trie par nombre d'utilisation de chaque élément)
+visualisation des flux de données entrant et sortant
+cryptage
+version des logiciels créé multiplateforme (Android, iOS, mac, Windows, linux, sur toutes les version après 2000 voir avant)
+optimiseur d'algorithme (comme la mémoire sur les valeur ne dépassant pas certaine valeur, les fonctions simplifiable et les parties du code inutile)
+tilemap génération
+mettre un auteur et une licence qui va généré en fonction de celle ci le nécessaire pour les droits d'auteur
+création de site internet et gestion de base de données
+création de film et d'animation
+simulation de physique
+
+librairie a créé :
+- texture (nature(roche, feuille, terre, bois...) et artificiel (métal, plastique...)) (pour chaque texture, associé un spectre d'absorption et de diffusion de la lumière visible et non visible (pour l'infrarouge))
+- toutes les propriétés de physique comme les fluide, la gravité, les forces fondamentales, la température (conductivité, et rayonnement), effet doppler (son et lumière) ect...
+- mettre une liste des atomes, molécules et réaction chimique et l'ensemble de leur propriété et donné les concernant
+- lumière provenant de loi de la physique (thermodynamique)
+- forme 2d et 3d
+- bouton template
+- personnage de base
+- son d'oiseau (avec resimulation des échos et des cordes vocales (ainsi que tout l'appareil vocal)
+- élément chimique
+- propriété quantique
+- fonction mathématiques et autre outil mathématiques
+- outils d'analyse scientifique
+- différents composants graphique comme les liste box ...
+- mettre un rendu en direct comme octane
+- outil de migration de logiciel (décompile -> c++ -> visual scripting et autre fichier logiciel)
+... (voir la liste des logiciels)
+mettre en place le nécessaire pour la sécurisation, mise en vente et revenu du logiciel ainsi que la pub automatique, la gestion d'entreprise et de messagerie
+faire des sessions (nommer et avec des gens a ajouté) pour mettre tout les composants en communs (pour chaque connexion d'un des participants à la session, celui-ci va dans un premier temps, mettre a jour la liste des membres, et ensuite va donné à l'ensemble des participants ces créations, chacune de ces créations peut être soit en public (donc toutes les sessions qui sont connectés), soit restreint (donc seulement des sessions sélectionner) soit privé)), les fichiers serait dupliquer chez l'ensemble des participants de la session si celle-ci est classique, mais il est possible de designer une machine ou un support de stockage des éléments (le tout ce mettra à jour toutes les mises a jour d'assets ou d'ajout d'assets (a moins de désactiver l'option), sans faire de commande (contrairement à github)) les sessions se connecteront soit en copiant l'adresse de celle-ci, soit avec un serveur qui relie les différentes adresses, les sessions pourront avoir des projets collaboratifs où les participants pourront tous travaillé sur une même interface lié (un peu comme pleins de TeamViewer aux qu'elles on peut jeter un coup d'oeil, effectuer des modifications et aller sur d'autres éléments en même temps que les autres avec une miniature de chaque personne du projet en temps réel)
+
+pause process
+nurbs
