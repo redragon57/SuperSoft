@@ -1,0 +1,81 @@
+using template<typename T>;
+
+public void fun(T? *a = 0, T? *b = 0, T? *c = 0){
+	T?[] bat = {a, b, c};
+}
+
+fun(a=&x,c=&y);
+
+
+NullableType<T> = ?
+//faire un template pour convertir le ? en nullable type
+
+
+
+template<typename T> class AvgOp { 
+	public: 
+		T operator()(const T& left, const T& right){return (left + right) / 2;}
+	};
+IDOP_CREATE_LEFT_HANDED(<, _avg_, >, AvgOp)
+#define avg <_avg_>
+
+
+
+
+&
+	Binary AND
+|
+	Binary OR
+^
+	Binary XOR
+~
+	Binary One's Complement
+<<
+	Binary Shift Left
+>>
+	Binary Shift Right
+	
+	
+	
+	
+sizeof
+	returns the size of data type
+	sizeof(int); // 4
+?: 
+	returns value based on the condition
+	string result = (5 > 0) ? "even" : "odd"; // "even"
+&
+	represents memory address of the operand
+	&num; // address of num
+.
+	accesses members of struct variables or class objects
+	s1.marks = 92;
+->
+	used with pointers to access the class or struct variables
+	ptr->marks = 92;
+<<
+	prints the output value
+	cout << 5;
+>>
+	gets the input value
+	cin >> num;
+	
+	
+=
+	a = b;
+	a = b;
++=
+	a += b;
+	a = a + b;
+-=
+	a -= b;
+	a = a - b;
+*=
+	a *= b;
+	a = a * b;
+/=
+	a /= b;
+	a = a / b;
+%=
+	a %= b;
+	a = a % b;
