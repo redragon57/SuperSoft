@@ -37,19 +37,18 @@ class Arc : public Widget{
         }
         void Render(SDL_Renderer *rend) override{
             SDL_SetRenderDrawColor(rend,50,150,250,0);
-            begin%=360,ending%=360;
-            b.w = radius*2; b.h = radius*2;
+            begin%=360,ending%=360; b.w = radius*2; b.h = radius*2;
             if (ending<begin){
                 int saveend = ending; ending = 359; Render(rend);
                 begin = 0; ending = saveend; Render(rend);
             }
             else{
-                int rad = (radius-thick)*(radius-thick), rad2 = radius*radius;
-                float beg = begin * PI / 180, end = ending * PI / 180;
-                for (int w = 0; w < b.w; w++)
-                    for (int h = 0; h < b.h; h++){
-                        int dx = (float)radius - w, dy = (float)radius - h, res = dx*dx + dy*dy;
-                        float point_angle = getAngle(w-radius,h-radius);
+                int dx, dy, res, w = 0, h = 0, rad = (radius-thick)*(radius-thick), rad2 = radius*radius;
+                float point_angle, beg = begin * PI / 180, end = ending * PI / 180;
+                for (; w < b.w; w++)
+                    for (h = 0; h < b.h; h++){
+                        dx = (float)radius - w; dy = (float)radius - h; res = dx*dx + dy*dy;
+                        point_angle = getAngle(w-radius,h-radius);
                         if (res <= rad2 && res>rad && point_angle<=end && beg <= point_angle)
                             SDL_RenderDrawPoint(rend, b.x + dx, b.y + dy);
                     }
@@ -59,13 +58,16 @@ class Arc : public Widget{
 class Circle : public Widget{
     public:
         int radius, thick = 2;
+        Circle(SDL_Rect r, int rad, int thk = 2){
+            b=r;radius=rad;thick=thk;
+        }
         void Render(SDL_Renderer *rend) override {
             SDL_SetRenderDrawColor(rend,50,150,250,0);
             b.w = radius*2; b.h = radius*2;
-            int rad = (radius-thick)*(radius-thick), rad2 = radius*radius;
-            for (int w = 0; w < radius * 2; w++)
-                for (int h = 0; h < radius * 2; h++){
-                    int dx = radius - w,dy = radius - h,res = dx*dx + dy*dy;
+            int dx, dy, res, w = 0, h = 0, rad = (radius-thick)*(radius-thick), rad2 = radius*radius;
+            for (; w < radius * 2; w++)
+                for (h = 0; h < radius * 2; h++){
+                    dx = radius - w; dy = radius - h; res = dx*dx + dy*dy;
                     if (res <= rad2 && res>rad) SDL_RenderDrawPoint(rend, b.x + dx, b.y + dy);
                 }
         }
@@ -78,11 +80,11 @@ class Round : public Widget{
         }
         void Render(SDL_Renderer *rend) override {
             SDL_SetRenderDrawColor(rend,50,150,250,0);
-            int rad = radius*radius;
             b.w = radius*2; b.h = radius*2;
-            for (int w = 0; w < b.w; w++)
-                for (int h = 0; h < b.h; h++){
-                    int dx = radius - w,dy = radius - h;
+            int dx, dy, w = 0, h = 0, rad = radius*radius;
+            for (; w < b.w; w++)
+                for (h = 0; h < b.h; h++){
+                    dx = radius - w;dy = radius - h;
                     if ((dx*dx + dy*dy) <= rad)
                         SDL_RenderDrawPoint(rend, b.x + dx, b.y + dy);
                 }
@@ -100,8 +102,9 @@ class Line : public Widget{
         }
         void Render(SDL_Renderer * rend) override {
             SDL_SetRenderDrawColor(rend,50,150,250,0);
-            if (b.x<b.y) for (int i = 0; i < thick; i++) SDL_RenderDrawLine(rend,x1+i, y1, x2+i, y2);
-            else for (int i = 0; i < thick; i++) SDL_RenderDrawLine(rend,x1, y1+i, x2, y2+i);
+            int i = 0;
+            if (b.x<b.y) for (; i < thick; i++) SDL_RenderDrawLine(rend,x1+i, y1, x2+i, y2);
+            for (; i < thick; i++) SDL_RenderDrawLine(rend,x1, y1+i, x2, y2+i);
         }
 };
 class Box : public Widget{
@@ -164,15 +167,15 @@ class Image : public Widget{
         Image(SDL_Rect r,std::string chem){
             b=r;path = chem;
         }
-        void Render(SDL_Renderer* renderer) override {
-            SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, IMG_Load(path.c_str()));
+        void Render(SDL_Renderer* rend) override {
+            SDL_Texture* Message = SDL_CreateTextureFromSurface(rend, IMG_Load(path.c_str()));
             int texW = 0,texH = 0; SDL_QueryTexture(Message, NULL, NULL, &texW, &texH);
-            b = { b.x, b.y, texW, texH }; SDL_RenderCopy(renderer, Message, NULL, &b);
+            b = { b.x, b.y, texW/2, texH/2 }; SDL_RenderCopy(rend, Message, NULL, &b);
         }
 };
 
 // Advanced object
-// 3D
+// 3D, graphique, node, graph
 class DNA : public Widget {
     public:
         //factoriser le calcule
@@ -181,20 +184,23 @@ class DNA : public Widget {
             b=r; radius = rad; avance = avan; verticale = vert;
         }
         void Sinusoid(SDL_Renderer *rend, int sinus, int h){
-            for (float w = sinus-radius; w < sinus; w++) {
+            float w = sinus-radius;
+            for (; w < sinus; w++) {
                 if (verticale) SDL_RenderDrawPoint(rend, b.x+w, b.y+h);
                 else SDL_RenderDrawPoint(rend, b.y+h,b.x+w);
             }
         }
         void Render(SDL_Renderer *rend) override{
             SDL_SetRenderDrawColor(rend,50,150,250,0);
+            int sinus, sinus2; bool first; float w,h=0;
+            uint8_t r,g,b2,a; SDL_GetRenderDrawColor(rend,&r,&g,&b2,&a);
             if (!verticale){
                 int save = b.x; b.x = b.y; b.y =save;
             }
-            for (float h = 0; h < b.h; h++){
-                int sinus = (sin((h+avance)/20)+1)*b.w+radius,
+            for (; h < b.h; h++){
+                sinus = (sin((h+avance)/20)+1)*b.w+radius;
                 sinus2 = (sin((h+avance)/20+PI)+1)*b.w+radius;
-                bool first = sinus>(sin((h+avance-2)/20)+1)*b.w+radius;
+                first = sinus>(sin((h+avance-2)/20)+1)*b.w+radius;
                 if (first) radius += 15; Sinusoid(rend,sinus,h);
                 if (!first) radius += 15;Sinusoid(rend,sinus2,h);
                 radius-=15;
@@ -203,9 +209,8 @@ class DNA : public Widget {
                         int savesin = sinus; sinus = sinus2; sinus2 = savesin;
                     }
                     if (sinus2-sinus>30){
-                        uint8_t r,g,b2,a; SDL_GetRenderDrawColor(rend,&r,&g,&b2,&a);
                         SDL_SetRenderDrawColor(rend, r-50,g-50,b2-50,a);
-                        for (float w = sinus-radius/2; w < sinus2-radius/2; w++) {
+                        for (w = sinus-radius/2; w < sinus2-radius/2; w++) {
                             if (verticale) SDL_RenderDrawPoint(rend, b.x+w, b.y+h);
                             else SDL_RenderDrawPoint(rend, b.y+h,b.x+w);
                         }
