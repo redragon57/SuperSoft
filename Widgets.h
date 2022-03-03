@@ -130,7 +130,7 @@ class Label : public Widget{
                 printf("TTF_OpenFont: %s\n", TTF_GetError());
             }
             SDL_Color Blue = {50, 150, 250};
-            SDL_Surface* surfaceMessage = TTF_RenderText_Blended(police, txt.c_str(), Blue);
+            SDL_Surface* surfaceMessage = TTF_RenderUTF8_Blended(police, txt.c_str(), Blue);
             SDL_Texture* Message = SDL_CreateTextureFromSurface(rend, surfaceMessage);
             int texW = 0,texH = 0;
             SDL_QueryTexture(Message, NULL, NULL, &texW, &texH);

@@ -11,19 +11,63 @@
 #include <string>
 #include <iostream>
 #include <chrono>
+#include <algorithm>
+#include <bits/stdc++.h>
 #include "Widgets.h"
 #pragma comment(lib, "user32.lib")
 using namespace std;
 
+// faire un système de recherche de logiciel
+
 uint16_t nb_Frame = 0, FPS = 0;
-bool isFullScreen = true,close = false;
-string path = "Home >";
+bool isFullScreen = true, close = false;
+string path = "Home > ";
 vector<Widget*> all;
-vector<bool> active = {false,false};
 int8_t mouse = 0;
+// A modifier (faire toute les disciplines)
+vector<string> active, groupsoft = 
+{"Outil à la création","Réseau","Sécurité","Gestion de fichier","Internet","Biologie","Physique",
+"Math","Economie","Divers","Outil favoris","Paramétre"};
+vector<vector<string>> software = {
+    {"Visual Scripting","Commentateur de programme","Machine leaming",
+    "Convertisseur de langage","Éditeur de texte","Modélisation 3D","Moteur de jeu",
+    "Éditeur d'Image","Animation","Music maker","Créateur de clé bootable","SQL",
+    "Éditeur de vidéos","Optimiseur de programme","Optimiseur de graphisme",
+    "Créateur dOS","Simulateur dOS"},
+    {"IP connect","Traceroute map","VPN","Image réseaux"},
+    {"Hacker","Antivirus","Crypteur","Espionneur","Voice analyseur","Face récognition",
+    "Morphologie calculator","Sound learning"},
+    {"PDF","Manageur de fichier","Compresseur de donnée","Optimiseur de fichier"},
+    {"Chercheur d'information","Navigateur internet","Tchat","Prise en main à distance",
+    "Partage de lien","Sci-hub","Bureau à distance"},
+    {"Éditeur de gène","Être vivant","Génétique"},
+    {"Matériaux","Planète","Galaxie","Simulation de physique","Inventor","Maison","Pubchem",
+    "Manufacture"},
+    {"Convertisseur","Matrice","Visualisateur de fonction","Créateur d'exercices",
+    "Résolveur d'exercices"},
+    {"Bourse","Comptabilité","Caisse enregistreuse","Gestion de compte en banque et d'économie"},
+    {"Crackeur de logiciel","OCR","Traducteur","Soundbar","Suggestion musique","Simulateur de shell",
+    "Gestionnaire de Raspberry","Simulateur de processeur quantique","Schéma électronique",
+    "Roadmap","Copieur de logiciel","Téléphone","Vidéo downloader","Autoinstallateur",
+    "Music downloader","Reconnaissance musical","Latex et formule","Traducteur",
+    "Remote entre appareil connecté","Hand Controller","Importeur de système à distance",
+    "Minage de cryptomonnaie","Musique","Vidéo","Alerteur d'événement","Spammer"},{},{}};
 
 // mettre une initialisation et des menu séparer pour améliorer les performances
 // FAIRE LES EVENTS
+
+void join(const vector<string>& v, string c, string& s) {
+    s.clear();
+    for (vector<string>::const_iterator p = v.begin(); p != v.end(); ++p) {
+        s += *p; if (p != v.end() - 1) s += c;
+    }
+}
+
+template <typename T>
+bool contains(vector<T> vec, const T & elem){
+    if (find(vec.begin(), vec.end(), elem) != vec.end()) return true;
+    return false;
+}
 
 void toggleFullScreen(SDL_Window* window){
     isFullScreen = !isFullScreen;
@@ -44,27 +88,44 @@ void CircleLoad(SDL_Rect b, int rad, int thick, int deg){
 }
 
 void ListFuturist(vector<string> liste, int x, int y, SDL_Rect b){
-    int i = 0, lisize = liste.size(), sizettf = 14, sizecircle = 2, separation = 18;
+    int asize = active.size(), i = 0, lisize = liste.size(), sizettf = 14, sizecircle = 2, separation = 18;
+    SDL_Rect lblb; bool isactive, isin;
+    join(active, " > ", path);
+    path = "Home > " + path;
+    if (asize!=0) {
+        if (asize<2) liste = software[find(liste.begin(),liste.end(),active[0])-liste.begin()];
+        else liste.clear();
+        liste.insert(liste.begin(),active.begin(),active.end());
+    }
+    lisize = liste.size();
     for (; i < lisize; i++){
+        lblb = {b.x+separation,b.y+i*separation-(sizettf+sizecircle-separation)/2,100,sizettf};
+        isactive = contains(active, liste[i]);
+        isin = lblb.x <= x && x <= lblb.x+lblb.w && lblb.y <= y && y <= lblb.y+lblb.h;
         all.push_back(new Round({b.x+separation/2,b.y+i*separation+separation/2,0,0},sizecircle));
-        all.push_back(new Label({b.x+separation,b.y+i*separation-(sizettf+sizecircle-separation)/2,100,sizettf},liste[i],sizettf));
-        SDL_Rect lblb = all[all.size()-1]->b;
-        if (lblb.x <= x && x <= lblb.x+lblb.w && lblb.y <= y && y <= lblb.y+lblb.h){
-            if (mouse%2==1) active[0]=true;
-            if (active[0]) CircleLoad({lblb.x-separation/2,lblb.y+separation/2-1,0,0},6,2,30);
-            else CircleLoad({lblb.x-separation/2,lblb.y+separation/2-1,0,0},6,2,nb_Frame<<2);
+        all.push_back(new Label(lblb,liste[i],sizettf));
+        if (isactive){
+            if (mouse%2==1 && isin) active.erase(active.end());
+            CircleLoad({lblb.x-separation/2,lblb.y+separation/2-1,0,0},6,2,90);
+            b.x+=separation/2; b.y+=separation/2;
+        }
+        else if (isin){
+            if (mouse%2==1) active.push_back(liste[i]);
+            CircleLoad({lblb.x-separation/2,lblb.y+separation/2-1,0,0},6,2,nb_Frame<<2);
         }
     }
-    i = b.y+(lisize-0.2)*separation;
-    all.push_back(new Line(b.x,b.y,b.x,i));
-    all.push_back(new Line(b.x,i,5+separation/1.5+b.x,i+separation/2));
+    if (asize<2) {
+        i = b.y+(lisize-0.2)*separation;
+        all.push_back(new Line(b.x,b.y,b.x,i));
+        all.push_back(new Line(b.x,i,5+separation/1.5+b.x,i+separation/2));
+    }
 }
 
 void base_interface(int x, int y, int w, int h){
     all.push_back(new Label({0,0,0,0},path,12));
     all.push_back(new Label({0,h-14,0,0},to_string(x)+"/"+to_string(w)+" : "+to_string(y)+"/"+to_string(h)
         +" : " + to_string(FPS) + " FPS",14));
-    ListFuturist({"Visual Scripting","Modelisation 3D","Image","Son","Moteur de jeu"},x,y,{5,20,0,0});
+    ListFuturist(groupsoft,x,y,{5,20,0,0});
 }
 
 void main_loop(SDL_Renderer* rend, SDL_Window* win){
@@ -79,8 +140,7 @@ void main_loop(SDL_Renderer* rend, SDL_Window* win){
                     default:break;
                 }
             case SDL_MOUSEBUTTONDOWN:
-                switch (event.button.button)
-                {
+                switch (event.button.button){
                     case SDL_BUTTON_LEFT: mouse=1;
                     case SDL_BUTTON_RIGHT: mouse+=2;
                     case SDL_BUTTON_MIDDLE: mouse+=4; break;
@@ -119,11 +179,11 @@ int main(int argc, char *argv[]){
     chrono::_V2::steady_clock::time_point start;
     chrono::duration<double> duree;
     while (!close){
-        start = chrono::steady_clock::now();
-        mouse = 0;
+        start = chrono::steady_clock::now(); mouse = 0;
         main_loop(rend,win);
         SDL_SetRenderDrawColor(rend,20,20,20,0);
         SDL_RenderPresent(rend);
+        SDL_Delay(1000/70);
         duree = chrono::steady_clock::now()-start;
         FPS = 1/(duree.count());
     }
