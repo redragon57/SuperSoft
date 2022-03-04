@@ -109,10 +109,41 @@ class Line : public Widget{
 };
 class Box : public Widget{
     public:
+        Box(SDL_Rect r){
+            b=r;
+        }
         void Render(SDL_Renderer *rend) override {
             SDL_RenderDrawRect(rend,&b);
         }
 };
+class Cube : public Widget{
+    public:
+        Cube(SDL_Rect r){
+            b=r;
+        }
+        void Render(SDL_Renderer *rend) override {
+            SDL_SetRenderDrawColor(rend,50,150,250,0); float w,h=0;
+            for (; h < b.h; h++)
+                for (w=0; w < b.w; w++)
+                    if (h<w+b.w*3/4&&w-b.w*3/4<h) SDL_RenderDrawPoint(rend, b.x+w, b.y+h);
+        }
+};
+class Hexagone : public Widget{
+    public:
+        Hexagone(SDL_Rect r){
+            b=r;
+        }
+        void Render(SDL_Renderer *rend) override {
+            SDL_SetRenderDrawColor(rend,50,50,50,0); float w,h=0;
+            for (; h < b.h/2; h++)
+                for (w=b.w/3; w < b.w*2/3+h; w++)
+                    SDL_RenderDrawPoint(rend, b.x+w-h/2, b.y+h);
+            for (; h < b.h; h++)
+                for (w=b.w/3; w < b.w*2/3+b.h-h; w++)
+                    SDL_RenderDrawPoint(rend, b.x+w-b.h/2+h/2, b.y+h);
+        }
+};
+
 
 // Standard object
 // pour tout les objets standard, mettre des events automatiquement

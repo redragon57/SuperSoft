@@ -54,7 +54,6 @@ vector<vector<string>> software = {
     "Minage de cryptomonnaie","Musique","Vidéo","Alerteur d'événement","Spammer"},{},{}};
 
 // mettre une initialisation et des menu séparer pour améliorer les performances
-// FAIRE LES EVENTS
 
 void join(const vector<string>& v, string c, string& s) {
     s.clear();
@@ -80,6 +79,8 @@ void toggleFullScreen(SDL_Window* window){
     else SDL_SetWindowSize(window,800,800);
     SDL_SetWindowFullscreen(window, !isFullScreen);
 }
+
+#pragma region interface
 
 void CircleLoad(SDL_Rect b, int rad, int thick, int deg){
     all.push_back(new Arc(b,rad,thick,deg,80+deg)); deg += 120;
@@ -128,6 +129,17 @@ void base_interface(int x, int y, int w, int h){
     ListFuturist(groupsoft,x,y,{5,20,0,0});
 }
 
+#pragma endregion
+
+void background(int w, int h){
+    int j, i = 0;
+    for (; i < h/24+2; i++)
+        for (j=0; j < w/40+2; j++){
+            all.push_back(new Hexagone({j*44-22,-11+i*24,40,20}));
+            all.push_back(new Hexagone({j*44,i*24,40,20}));
+        }
+}
+
 void main_loop(SDL_Renderer* rend, SDL_Window* win){
     //event
     SDL_Event event;
@@ -153,9 +165,10 @@ void main_loop(SDL_Renderer* rend, SDL_Window* win){
 
     all.clear(); 
     int x, y, w, h; SDL_GetMouseState(&x, &y); SDL_GetWindowSize(win, &w, &h);
+    background(w,h);
     base_interface(x,y,w,h);
 
-    CircleLoad({300,300,0,0},60,15,nb_Frame<<1);
+    //CircleLoad({300,300,0,0},60,15,nb_Frame<<1);
     //all.push_back(new Image({200,10,0,0},"World_map_-_low_resolution.png"));
     //all.push_back(new DNA({30,200,50,200},15,1.5*nb_Frame));
     for (Widget* w : all) w->Render(rend);
