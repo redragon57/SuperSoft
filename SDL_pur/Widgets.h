@@ -13,9 +13,29 @@
 
 #define PI 3.14159265358979323f
 
+// séparer chaque widget une fois que tout fonctionnel
+// globaliser et rajouter des paramètres et des valeurs par défaut
+// mettre tout les widget dans un dossier les contenants
+
 // mettre en place des ancres haut, bas ...
 float getAngle(int x, int y){
     return PI-atan2(y,x);
+}
+float min(std::vector<float> v){
+    float a = v[0];
+    for (float f : v) if (f<a) a=f;
+    return a;
+}
+float max(std::vector<float> v){
+    float a = v[0];
+    for (float f : v) if (f>a) a=f;
+    return a;
+}
+
+void setPixel(SDL_Surface *surface, Uint8 r, Uint8 g, Uint8 b, Uint8 a, size_t x, size_t y){
+    Uint32 *pixels = (Uint32 *)surface->pixels; /* Nos pixels sont sur 32 bits */
+    Uint32 couleur = SDL_MapRGBA(surface->format, r, g, b, a);
+    pixels[y * surface->w + x] = couleur;
 }
 
 //mettre plus de paramétrage comme la couleur ou la police les ellipses...
@@ -29,6 +49,19 @@ class Widget{
 
 // Forme
 
+class Surface : public Widget {
+    public:
+        SDL_Texture *text;
+        Surface(SDL_Rect r, SDL_Texture * texture){
+            b=r; text=texture;
+        }
+        void Render(SDL_Renderer *rend) override {
+            SDL_SetRenderDrawColor(rend, 50, 50, 50, 0);
+            SDL_SetRenderTarget(rend, text);
+            SDL_RenderCopy(rend, text, &b, NULL);
+            SDL_DestroyTexture(text);
+        }
+};
 class Arc : public Widget{
     public:
         int radius, thick = 2, begin = 0, ending = 359;
@@ -130,20 +163,23 @@ class Cube : public Widget{
 };
 class Hexagone : public Widget{
     public:
-        Hexagone(SDL_Rect r){
-            b=r;
-        }
-        void Render(SDL_Renderer *rend) override {
-            SDL_SetRenderDrawColor(rend,50,50,50,0); float w,h=0;
+        SDL_Texture *text;
+        Hexagone(SDL_Rect r, SDL_Renderer * rend){
+            b=r; float w,h=0; Uint32 *pixels;
+            sur = SDL_CreateRGBSurfaceWithFormat(0, b.w, b.h, 32, SDL_PIXELFORMAT_RGBA8888); 
+            SDL_UnlockSurface(sur);
             for (; h < b.h/2; h++)
                 for (w=b.w/3; w < b.w*2/3+h; w++)
-                    SDL_RenderDrawPoint(rend, b.x+w-h/2, b.y+h);
+                    setPixel(sur, 50, 50, 50, 0, w-h/2, h);
             for (; h < b.h; h++)
                 for (w=b.w/3; w < b.w*2/3+b.h-h; w++)
-                    SDL_RenderDrawPoint(rend, b.x+w-b.h/2+h/2, b.y+h);
+                    setPixel(sur, 50, 50, 50, 0, w-b.h/2+h/2, h);
+        }
+        void Render(SDL_Renderer *rend) override {
+            Surface* s = new Surface(b,sur);
+            s->Render(rend);
         }
 };
-
 
 // Standard object
 // pour tout les objets standard, mettre des events automatiquement
@@ -202,6 +238,28 @@ class Image : public Widget{
             SDL_Texture* Message = SDL_CreateTextureFromSurface(rend, IMG_Load(path.c_str()));
             int texW = 0,texH = 0; SDL_QueryTexture(Message, NULL, NULL, &texW, &texH);
             b = { b.x, b.y, texW/2, texH/2 }; SDL_RenderCopy(rend, Message, NULL, &b);
+        }
+};
+class Graphique : public Widget{
+    public:
+        std::vector<float> x,y; 
+        Graphique(SDL_Rect r, std::vector<float> li){
+            b=r;
+            for (int i = 0; i < li.size(); i++){
+                x.push_back(i); y.push_back(li[i]);
+            }
+        }
+        Graphique(SDL_Rect r, std::vector<float> lix, std::vector<float> liy){
+            
+        }
+        void Render(SDL_Renderer *rend){
+            float mx = b.w/(max(x)-min(x)), my = b.h/(max(y)-min(y));
+            Line * l; Round * r = new Round({(int)(x[0]*mx+(float)b.x),(int)((float)b.y-y[0]*my),0,0},3); r->Render(rend);
+            for (int i = 1; i < y.size() && i < x.size(); i++){
+                l = new Line(x[i-1]*mx+(float)b.x, (int)((float)b.y-y[i-1]*my), x[i]*mx+(float)b.x, (float)b.y-y[i]*my,3);
+                r = new Round({(int)(x[i]*mx+(float)b.x), (int)((float)b.y-y[i]*my),0,0},3);
+                l->Render(rend); r->Render(rend);
+            }
         }
 };
 
