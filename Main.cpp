@@ -5,16 +5,18 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <vector>
-#include <string>
 
 #if !SDL_VERSION_ATLEAST(2,0,17)
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
 #endif
 
-std::vector<std::string> active, groupsoft = 
+bool isFullScreen = true;
+std::vector<const char*> show_window = {};
+
+std::vector<const char *> groupsoft = 
 {"Outil à la création","Réseau","Sécurité","Gestion de fichier","Internet","Biologie","Physique",
-"Math","Economie","Divers","Outil favoris","Paramétre"};
-std::vector<std::vector<std::string>> software = {
+"Math","Economie","Divers","Outil favoris","Paramétre","Proposition"};
+std::vector<std::vector<const char *>> software = {
     {"Visual Scripting","Commentateur de programme","Machine leaming",
     "Convertisseur de langage","Éditeur de texte","Modélisation 3D","Moteur de jeu",
     "Éditeur d'Image","Animation","Music maker","Créateur de clé bootable","SQL",
@@ -37,13 +39,49 @@ std::vector<std::vector<std::string>> software = {
     "Roadmap","Copieur de logiciel","Téléphone","Vidéo downloader","Autoinstallateur",
     "Music downloader","Reconnaissance musical","Latex et formule","Traducteur",
     "Remote entre appareil connecté","Hand Controller","Importeur de système à distance",
-    "Minage de cryptomonnaie","Musique","Vidéo","Alerteur d'événement","Spammer"},{},{}};
+    "Minage de cryptomonnaie","Musique","Vidéo","Alerteur d'événement","Spammer"},{}};
+
+// faire des textes clickable
+// faire toggle fullscreen
+// faire fond hexagone
 
 void Home(ImGuiIO& io){
-    static float f = 0.0f;
-    ImGui::Text("Home > ");
-    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    //ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    //const ImU32 col = ImColor(ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+    //draw_list->AddCircleFilled(ImVec2(12.0f, 12.0f), 12.0f, col, 6);
+    ImGui::DockSpaceOverViewport();
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("Software")) {
+            for (int i = 0; i < groupsoft.size()-2; i++)
+                if (ImGui::BeginMenu(groupsoft[i])) {
+                    for (int j = 0; j < software[i].size(); j++)
+                        if (ImGui::MenuItem(software[i][j]))
+                            show_window.push_back(software[i][j]);
+                    ImGui::EndMenu();
+                }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Help")) {
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("About")) {
+            ImGui::ShowAboutWindow(); ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+}
+
+void FunctionExecutor(const char* s){
+    int i = 0;
+    if(!ImGui::Begin(s, (bool*)true, 0)) ImGui::End();
+    else {
+        ImGui::Text(s);
+        switch(i){
+            case 0: break;
+            default: break;
+        }
+        ImGui::End();
+    }
 }
 
 int main(int, char**){
@@ -54,55 +92,55 @@ int main(int, char**){
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     SDL_Window* window = SDL_CreateWindow("SuperSoft", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 800, window_flags);
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL)
-    {
+    if (renderer == NULL) {
         SDL_Log("Error creating SDL_Renderer!");
-        return false;
+        return EXIT_FAILURE;
     }
-    //SDL_RendererInfo info;
-    //SDL_GetRendererInfo(renderer, &info);
-    //SDL_Log("Current SDL_Renderer: %s", info.name);
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.Fonts->AddFontFromFileTTF("Ubuntu/Ubuntu-Light.ttf", 16.0f);
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigDockingWithShift = true;
     ImGui::StyleColorsDark();
     ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer_Init(renderer);
-    bool show_demo_window = true;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
-    // Main loop
+    for(auto && v : vals){
+        myvector.insert(myvector.end(), v.begin(), v.end());
+    }
+
     bool done = false;
+    ImGuiStyle* style = &ImGui::GetStyle();
+    style->Colors[ImGuiCol_Text] = ImVec4(0.2f, 0.6f, 1.0f, 1.00f);
+    // Main loop
     while (!done) {
         SDL_Event event;
         while (SDL_PollEvent(&event)){
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT) done = true;
-            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-                done = true;
+            if (event.type == SDL_WINDOWEVENT && 
+            event.window.event == SDL_WINDOWEVENT_CLOSE && 
+            event.window.windowID == SDL_GetWindowID(window)) done = true;
+            if (SDL_KEYDOWN==event.type)
+                switch (event.key.keysym.scancode) {
+                    case SDL_SCANCODE_F11: break;
+                    default:break;
+                }
         }
-        ImGui_ImplSDLRenderer_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
-        if (show_demo_window){
-            Home(io);
-        }
+        ImGui_ImplSDLRenderer_NewFrame(); ImGui_ImplSDL2_NewFrame(); ImGui::NewFrame();
+        Home(io); for (const char* s : ) FunctionExecutor(s);
         // Rendering
         ImGui::Render();
         SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
         SDL_RenderClear(renderer);
         ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
         SDL_RenderPresent(renderer);
+        SDL_Delay(1000/72);
     }
     // Cleanup
-    ImGui_ImplSDLRenderer_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
+    ImGui_ImplSDLRenderer_Shutdown(); ImGui_ImplSDL2_Shutdown(); ImGui::DestroyContext();
+    SDL_DestroyRenderer(renderer); SDL_DestroyWindow(window); SDL_Quit();
     return 0;
 }
