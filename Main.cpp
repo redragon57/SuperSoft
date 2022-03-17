@@ -5,15 +5,14 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <vector>
+#include <algorithm>
 
 #if !SDL_VERSION_ATLEAST(2,0,17)
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
 #endif
 
-bool isFullScreen = true;
-std::vector<const char*> show_window = {};
-
-std::vector<const char *> groupsoft = 
+bool fullscreen = false;
+std::vector<const char *> show_window, groupsoft = 
 {"Outil à la création","Réseau","Sécurité","Gestion de fichier","Internet","Biologie","Physique",
 "Math","Economie","Divers","Outil favoris","Paramétre","Proposition"};
 std::vector<std::vector<const char *>> software = {
@@ -41,20 +40,37 @@ std::vector<std::vector<const char *>> software = {
     "Remote entre appareil connecté","Hand Controller","Importeur de système à distance",
     "Minage de cryptomonnaie","Musique","Vidéo","Alerteur d'événement","Spammer"},{}};
 
-// faire des textes clickable
+
 // faire toggle fullscreen
 // faire fond hexagone
+
+void togglefullscreen(ImGuiIO& io){
+    if(fullscreen) {
+        io.ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
+        ImGui::UpdatePlatformWindows();
+    }
+    else io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    fullscreen = !fullscreen;
+    printf("lol\n");
+}
+
+template <typename T>
+bool contains(std::vector<T> vec, const T & elem){
+    if (find(vec.begin(), vec.end(), elem) != vec.end()) return true;
+    return false;
+}
 
 void Home(ImGuiIO& io){
     //ImDrawList* draw_list = ImGui::GetWindowDrawList();
     //const ImU32 col = ImColor(ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
     //draw_list->AddCircleFilled(ImVec2(12.0f, 12.0f), 12.0f, col, 6);
+    int j, i = 0;
     ImGui::DockSpaceOverViewport();
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("Software")) {
-            for (int i = 0; i < groupsoft.size()-2; i++)
+            for (; i < groupsoft.size()-2; i++)
                 if (ImGui::BeginMenu(groupsoft[i])) {
-                    for (int j = 0; j < software[i].size(); j++)
+                    for (j = 0; j < software[i].size(); j++)
                         if (ImGui::MenuItem(software[i][j]))
                             show_window.push_back(software[i][j]);
                     ImGui::EndMenu();
@@ -67,21 +83,26 @@ void Home(ImGuiIO& io){
         if (ImGui::BeginMenu("About")) {
             ImGui::ShowAboutWindow(); ImGui::EndMenu();
         }
+        ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
         ImGui::EndMainMenuBar();
     }
 }
 
 void FunctionExecutor(const char* s){
-    int i = 0;
-    if(!ImGui::Begin(s, (bool*)true, 0)) ImGui::End();
-    else {
-        ImGui::Text(s);
-        switch(i){
-            case 0: break;
-            default: break;
+    bool show = contains(show_window,s);
+    if(show){
+        int i = 0;
+        if(!ImGui::Begin(s, &show)) ImGui::End();
+        else{
+            ImGui::Text("%s",s);
+            switch(i){
+                case 0: break;
+                default: break;
+            }
+            ImGui::End();
         }
-        ImGui::End();
     }
+    if (!show) remove(show_window.begin(),show_window.end(),s);
 }
 
 int main(int, char**){
@@ -107,9 +128,8 @@ int main(int, char**){
     ImGui_ImplSDLRenderer_Init(renderer);
     ImVec4 clear_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
-    for(auto && v : vals){
-        myvector.insert(myvector.end(), v.begin(), v.end());
-    }
+    std::vector<const char *> all;
+    for(auto && v : software) all.insert(all.end(), v.begin(), v.end());
 
     bool done = false;
     ImGuiStyle* style = &ImGui::GetStyle();
@@ -125,19 +145,19 @@ int main(int, char**){
             event.window.windowID == SDL_GetWindowID(window)) done = true;
             if (SDL_KEYDOWN==event.type)
                 switch (event.key.keysym.scancode) {
-                    case SDL_SCANCODE_F11: break;
+                    case SDL_SCANCODE_F11: togglefullscreen(io); break;
                     default:break;
                 }
         }
         ImGui_ImplSDLRenderer_NewFrame(); ImGui_ImplSDL2_NewFrame(); ImGui::NewFrame();
-        Home(io); for (const char* s : ) FunctionExecutor(s);
+        Home(io); for (const char* s : all) FunctionExecutor(s);
         // Rendering
         ImGui::Render();
         SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
         SDL_RenderClear(renderer);
         ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
         SDL_RenderPresent(renderer);
-        SDL_Delay(1000/72);
+        //SDL_Delay(1000/72);
     }
     // Cleanup
     ImGui_ImplSDLRenderer_Shutdown(); ImGui_ImplSDL2_Shutdown(); ImGui::DestroyContext();
