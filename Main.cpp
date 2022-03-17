@@ -1,5 +1,6 @@
 #include "Soft/include.cpp"
 #include "include.cpp"
+#include "PluginManager.h"
 
 #if !SDL_VERSION_ATLEAST(2,0,17)
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
@@ -132,6 +133,9 @@ int main(int, char**){
 
     for(auto && v : software) all.insert(all.end(), v.begin(), v.end());
 
+	PluginManager *pluginManager = new PluginManager();
+	delete pluginManager;
+
     bool done = false;
     ImGuiStyle* style = &ImGui::GetStyle();
     style->Colors[ImGuiCol_Text] = ImVec4(0.2f, 0.6f, 1.0f, 1.00f);
@@ -158,7 +162,7 @@ int main(int, char**){
         SDL_RenderClear(renderer);
         ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
         SDL_RenderPresent(renderer);
-        //SDL_Delay(1000/72);
+        SDL_Delay(1000/72);
     }
     // Cleanup
     ImGui_ImplSDLRenderer_Shutdown(); ImGui_ImplSDL2_Shutdown(); ImGui::DestroyContext();

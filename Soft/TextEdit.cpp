@@ -11,20 +11,18 @@ struct Funcs{
         return 0;
     }
 
-    // Note: Because ImGui:: is a namespace you would typically add your own function into the namespace.
-    // For example, you code may declare a function 'ImGui::InputText(const char* label, MyString* my_str)'
     static bool MyInputTextMultiline(const char* label, ImVector<char>* my_str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0)
     {
         IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
         return ImGui::InputTextMultiline(label, my_str->begin(), (size_t)my_str->size(), size, flags | ImGuiInputTextFlags_CallbackResize, Funcs::MyResizeCallback, (void*)my_str);
     }
 };
+
 void TxtEdit(){
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Open..", "Ctrl+O")) { /* Do stuff */ }
             if (ImGui::MenuItem("Save", "Ctrl+S"))   { /* Do stuff */ }
-            if (ImGui::MenuItem("Close", "Ctrl+W"))  { }
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();

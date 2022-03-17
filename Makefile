@@ -14,17 +14,17 @@
 #CXX = g++
 CXX = clang++
 
-EXE = Launcher
+EXE = ../Launcher
 IMGUI_DIR = imgui-master/
 SOURCES = Main.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_sdl.cpp $(IMGUI_DIR)/backends/imgui_impl_sdlrenderer.cpp
-SOURCES += Soft/*.cpp
+SOURCES += Soft/*.cpp *.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 
 CXXFLAGS = -std=c++11 -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
-CXXFLAGS += -g -Wall -Wformat -O0
+CXXFLAGS += -g -Wall -Wformat -O0 -lstdc++fs
 LIBS =
 
 ##---------------------------------------------------------------------
