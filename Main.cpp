@@ -11,12 +11,12 @@ std::vector<const char *> all, show_window, groupsoft =
 {"Outil à la création","Réseau","Sécurité","Gestion de fichier","Internet","Biologie","Physique",
 "Math","Economie","Divers","Outil favoris","Paramétre","Proposition"};
 std::vector<std::vector<const char *>> software = {
-    {"Visual Scripting","Commentateur de programme","Machine leaming",
+    {"Visual Scripting","Commentateur de programme","Machine learning",
     "Convertisseur de langage","Éditeur de texte","Modélisation 3D","Moteur de jeu",
     "Éditeur d'Image","Animation","Music maker","Créateur de clé bootable","SQL",
     "Éditeur de vidéos","Optimiseur de programme","Optimiseur de graphisme",
     "Créateur dOS","Simulateur dOS"},
-    {"IP connect","Traceroute map","VPN","Image réseaux"},
+    {"IP connect","Traceroute map","VPN","Image réseaux","FileSender"},
     {"Hacker","Antivirus","Crypteur","Espionneur","Voice analyseur","Face récognition",
     "Morphologie calculator","Sound learning"},
     {"PDF","Manageur de fichier","Compresseur de donnée","Optimiseur de fichier"},
@@ -100,6 +100,7 @@ void FunctionExecutor(const char* s){
             switch(i){
                 case 4: TxtEdit(); break;
                 case 5: Mod3D(); break;
+                case 21: FileSend(); break;
                 default: break;
             }
             ImGui::End();
