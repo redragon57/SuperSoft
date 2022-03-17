@@ -1,18 +1,12 @@
-#include "imgui-master/imgui.h"
-#include "imgui-master/backends/imgui_impl_sdl.h"
-#include "imgui-master/backends/imgui_impl_sdlrenderer.h"
-#include <stdio.h>
-#include <SDL2/SDL.h>
-#include <stdio.h>
-#include <vector>
-#include <algorithm>
+#include "Soft/include.cpp"
+#include "include.cpp"
 
 #if !SDL_VERSION_ATLEAST(2,0,17)
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
 #endif
 
 bool fullscreen = false;
-std::vector<const char *> show_window, groupsoft = 
+std::vector<const char *> all, show_window, groupsoft = 
 {"Outil à la création","Réseau","Sécurité","Gestion de fichier","Internet","Biologie","Physique",
 "Math","Economie","Divers","Outil favoris","Paramétre","Proposition"};
 std::vector<std::vector<const char *>> software = {
@@ -40,9 +34,11 @@ std::vector<std::vector<const char *>> software = {
     "Remote entre appareil connecté","Hand Controller","Importeur de système à distance",
     "Minage de cryptomonnaie","Musique","Vidéo","Alerteur d'événement","Spammer"},{}};
 
-
 // faire toggle fullscreen
 // faire fond hexagone
+// l'ensemble des logiciels seront des mods et aurons plusieurs version
+// "nom-du-logiciel_type_version.mod" "Modelisation-3d_N_0-0-1.mod"
+// L = Light, N = Normal, A = Advanced, E = Expert, U = Ultime
 
 void togglefullscreen(ImGuiIO& io){
     if(fullscreen) {
@@ -58,6 +54,12 @@ template <typename T>
 bool contains(std::vector<T> vec, const T & elem){
     if (find(vec.begin(), vec.end(), elem) != vec.end()) return true;
     return false;
+}
+template <typename T>
+int getIndex(std::vector<T> v, const T & K){
+    auto it = find(v.begin(), v.end(), K);
+    if (it != v.end()) return it - v.begin();
+    else return -1;
 }
 
 void Home(ImGuiIO& io){
@@ -91,12 +93,12 @@ void Home(ImGuiIO& io){
 void FunctionExecutor(const char* s){
     bool show = contains(show_window,s);
     if(show){
-        int i = 0;
+        int i = getIndex(all,s);
         if(!ImGui::Begin(s, &show)) ImGui::End();
         else{
-            ImGui::Text("%s",s);
             switch(i){
-                case 0: break;
+                case 4: TxtEdit(); break;
+                case 5: Mod3D(); break;
                 default: break;
             }
             ImGui::End();
@@ -128,7 +130,6 @@ int main(int, char**){
     ImGui_ImplSDLRenderer_Init(renderer);
     ImVec4 clear_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
-    std::vector<const char *> all;
     for(auto && v : software) all.insert(all.end(), v.begin(), v.end());
 
     bool done = false;
