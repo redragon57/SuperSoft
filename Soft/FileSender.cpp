@@ -1,15 +1,17 @@
 #include "../include.cpp"
-#include "ImGuiFileDialog.cpp"
+
+char * txt = "lol";
+
+char * openfilename() {
+    char filename[1024];
+    FILE *f = popen("zenity --file-selection", "r");
+    fgets(filename, 1024, f);
+    return filename;
+}
 
 void FileSend(){
-    // open Dialog Simple
-    if (ImGui::Button("Open File Dialog"))
-        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", ".");
-    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")){
-        if (ImGuiFileDialog::Instance()->IsOk()) {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-        }
-        ImGuiFileDialog::Instance()->Close();
+    if (ImGui::Button("Open File Dialog")){
+        txt = openfilename();
     }
+    ImGui::Text(txt);
 }

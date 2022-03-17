@@ -96,8 +96,8 @@ void FunctionExecutor(const char* s){
     if(show){
         int i = getIndex(all,s);
         if(!ImGui::Begin(s, &show)) ImGui::End();
-        else{
-            switch(i){
+        else {
+            switch(i){ 
                 case 4: TxtEdit(); break;
                 case 5: Mod3D(); break;
                 case 21: FileSend(); break;
