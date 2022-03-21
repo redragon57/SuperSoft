@@ -1,6 +1,6 @@
 #include "Soft/include.cpp"
 #include "include.cpp"
-#include "PluginManager.h"
+//#include "PluginManager.h"
 
 #if !SDL_VERSION_ATLEAST(2,0,17)
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
@@ -100,6 +100,7 @@ void FunctionExecutor(const char* s){
             switch(i){ 
                 case 4: TxtEdit(); break;
                 case 5: Mod3D(); break;
+                case 9: MusicMaker(); break;
                 case 21: FileSend(); break;
                 default: break;
             }
@@ -134,8 +135,7 @@ int main(int, char**){
 
     for(auto && v : software) all.insert(all.end(), v.begin(), v.end());
 
-	PluginManager *pluginManager = new PluginManager();
-	delete pluginManager;
+	//PluginManager *pluginManager = new PluginManager();	delete pluginManager;
 
     bool done = false;
     ImGuiStyle* style = &ImGui::GetStyle();
