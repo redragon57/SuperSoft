@@ -1,17 +1,10 @@
 #include "../include.cpp"
 
-char * txt = "lol";
-
-char * openfilename() {
-    char filename[1024];
-    FILE *f = popen("zenity --file-selection", "r");
-    fgets(filename, 1024, f);
-    return filename;
-}
+std::string txt = "lol";
 
 void FileSend(){
     if (ImGui::Button("Open File Dialog")){
-        txt = openfilename();
+        txt = openFileDialog();
     }
-    ImGui::Text(txt);
+    ImGui::Text("%s",txt.c_str());
 }

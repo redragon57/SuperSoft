@@ -2,6 +2,7 @@
 #include "include.cpp"
 //#include "PluginManager.h"
 
+
 #if !SDL_VERSION_ATLEAST(2,0,17)
 #error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
 #endif
@@ -40,6 +41,7 @@ std::vector<std::vector<const char *>> software = {
 // l'ensemble des logiciels seront des mods et aurons plusieurs version
 // "nom-du-logiciel_type_version.mod" "Modelisation-3d_N_0-0-1.mod"
 // L = Light, N = Normal, A = Advanced, E = Expert, U = Ultime
+// Factoriser certaines fonction comme openfilename
 
 void togglefullscreen(ImGuiIO& io){
     if(fullscreen) {
@@ -95,7 +97,7 @@ void FunctionExecutor(const char* s){
     bool show = contains(show_window,s);
     if(show){
         int i = getIndex(all,s);
-        if(!ImGui::Begin(s, &show)) ImGui::End();
+        if(!ImGui::Begin(s, &show, ImGuiWindowFlags_MenuBar)) ImGui::End();
         else {
             switch(i){ 
                 case 4: TxtEdit(); break;
@@ -134,7 +136,6 @@ int main(int, char**){
     ImVec4 clear_color = ImVec4(0.1f, 0.1f, 0.1f, 1.00f);
 
     for(auto && v : software) all.insert(all.end(), v.begin(), v.end());
-
 	//PluginManager *pluginManager = new PluginManager();	delete pluginManager;
 
     bool done = false;

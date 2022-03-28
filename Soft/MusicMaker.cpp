@@ -19,6 +19,8 @@ typedef struct  WAV_HEADER{
 
 wav_hdr wavHeader;
 int filelength = 0;
+std::string filePath = "";
+bool nav = false;
 
 int getFileSize(FILE* inFile){
     int fileSize = 0;
@@ -28,11 +30,11 @@ int getFileSize(FILE* inFile){
     return fileSize;
 }
 
-int MusicInfo(char * filePath){
+int MusicInfo(){
     int headerSize = sizeof(wav_hdr);
-    FILE* wavFile = fopen(filePath, "r");
+    FILE* wavFile = fopen(filePath.c_str(), "r");
     if (wavFile == nullptr) {
-        fprintf(stderr, "Unable to open wave file: %s\n", filePath);
+        fprintf(stderr, "Unable to open wave file: %s\n", filePath.c_str());
         return 0;
     }
     size_t bytesRead = fread(&wavHeader, 1, headerSize, wavFile);
@@ -49,36 +51,36 @@ int MusicInfo(char * filePath){
         filelength = getFileSize(wavFile);
     }
     fclose(wavFile);
+    return 1;
 }
-
 
 void MusicMaker(){
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Open..", "Ctrl+O")) { MusicInfo("/home/redragon57/Documents/git/SuperSoft/OBLXKQ - EUPHORIA SECRET.wav"); }
+            if (ImGui::MenuItem("Open..", "Ctrl+O")) { nav = true; }
             if (ImGui::MenuItem("Save", "Ctrl+S"))   { /* Do stuff */ }
             ImGui::EndMenu();
         }
         ImGui::EndMenuBar();
     }
-
+    if (nav) if ((filePath = openFileDialog()) != ""){ MusicInfo(); 
+    nav = false; }
     if (filelength != 0){
-        std::string temp = "File is                    :" + std::to_string(filelength)+ " bytes.";
-        ImGui::Text("%s",temp.c_str());
-        ImGui::Text("%s","RIFF header                :" + wavHeader.RIFF[0] + wavHeader.RIFF[1] + wavHeader.RIFF[2] + wavHeader.RIFF[3]);
-        ImGui::Text("%s","WAVE header                :" + wavHeader.WAVE[0] + wavHeader.WAVE[1] + wavHeader.WAVE[2] + wavHeader.WAVE[3]);
-        ImGui::Text("%s","FMT                        :" + wavHeader.fmt[0] + wavHeader.fmt[1] + wavHeader.fmt[2] + wavHeader.fmt[3]);
-        ImGui::Text("%s","Data size                  :" + wavHeader.ChunkSize);
-
+        std::string temp = filePath+"\nFile is                    :" + std::to_string(filelength)+ " bytes."+
+        "\nRIFF header                :" + wavHeader.RIFF[0] + wavHeader.RIFF[1] + wavHeader.RIFF[2] + wavHeader.RIFF[3]+
+        "\nWAVE header                :" + wavHeader.WAVE[0] + wavHeader.WAVE[1] + wavHeader.WAVE[2] + wavHeader.WAVE[3]+
+        "\nFMT                        :" + wavHeader.fmt[0] + wavHeader.fmt[1] + wavHeader.fmt[2] + wavHeader.fmt[3]+
+        "\nData size                  :" + std::to_string(wavHeader.ChunkSize)+
         // Display the sampling Rate from the header
-        ImGui::Text("%s","Sampling Rate              :" + wavHeader.SamplesPerSec);
-        ImGui::Text("%s","Number of bits used        :" + wavHeader.bitsPerSample );
-        ImGui::Text("%s","Number of channels         :" + wavHeader.NumOfChan);
-        ImGui::Text("%s","Number of bytes per second :" + wavHeader.bytesPerSec);
-        ImGui::Text("%s","Data length                :" + wavHeader.Subchunk2Size);
-        ImGui::Text("%s","Audio Format               :" + wavHeader.AudioFormat);
+        "\nSampling Rate              :" + std::to_string(wavHeader.SamplesPerSec)+
+        "\nNumber of bits used        :" + std::to_string(wavHeader.bitsPerSample) +
+        "\nNumber of channels         :" + std::to_string(wavHeader.NumOfChan)+
+        "\nNumber of bytes per second :" + std::to_string(wavHeader.bytesPerSec)+
+        "\nData length                :" + std::to_string(wavHeader.Subchunk2Size)+
+        "\nAudio Format               :" + std::to_string(wavHeader.AudioFormat)+
         // Audio format 1=PCM,6=mulaw,7=alaw, 257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
-        ImGui::Text("%s","Block align                :" + wavHeader.blockAlign);
-        ImGui::Text("%s","Data string                :" + wavHeader.Subchunk2ID[0] + wavHeader.Subchunk2ID[1] + wavHeader.Subchunk2ID[2] + wavHeader.Subchunk2ID[3]);
+        "\nBlock align                :" + std::to_string(wavHeader.blockAlign)+
+        "\nData string                :" + wavHeader.Subchunk2ID[0] + wavHeader.Subchunk2ID[1] + wavHeader.Subchunk2ID[2] + wavHeader.Subchunk2ID[3];
+        MultiLineText(temp.c_str());
     }
 }
